@@ -46,11 +46,15 @@ function updateNavbar() {
     );
 }
 
+
 window.addEventListener(
     "scroll",
     updateNavbar,
-    { passive: true }
+    {
+        passive: true
+    }
 );
+
 
 updateNavbar();
 
@@ -61,46 +65,68 @@ updateNavbar();
 
 if (menuToggle && navMenu) {
 
-    menuToggle.addEventListener("click", () => {
+    menuToggle.addEventListener(
+        "click",
+        () => {
 
-        const isOpen =
-            navMenu.classList.toggle("active");
+            const isOpen =
+                navMenu.classList.toggle(
+                    "active"
+                );
 
-        menuToggle.classList.toggle(
-            "active",
-            isOpen
-        );
 
-        document.body.classList.toggle(
-            "menu-open",
-            isOpen
-        );
+            menuToggle.classList.toggle(
+                "active",
+                isOpen
+            );
 
-        menuToggle.setAttribute(
-            "aria-expanded",
-            String(isOpen)
-        );
-    });
+
+            document.body.classList.toggle(
+                "menu-open",
+                isOpen
+            );
+
+
+            menuToggle.setAttribute(
+                "aria-expanded",
+                String(isOpen)
+            );
+
+        }
+    );
 
 
     navLinks.forEach(link => {
 
-        link.addEventListener("click", () => {
+        link.addEventListener(
+            "click",
+            () => {
 
-            navMenu.classList.remove("active");
+                navMenu.classList.remove(
+                    "active"
+                );
 
-            menuToggle.classList.remove("active");
 
-            document.body.classList.remove(
-                "menu-open"
-            );
+                menuToggle.classList.remove(
+                    "active"
+                );
 
-            menuToggle.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-        });
+
+                document.body.classList.remove(
+                    "menu-open"
+                );
+
+
+                menuToggle.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
+        );
+
     });
+
 }
 
 
@@ -118,17 +144,21 @@ function moveIndicator(link) {
         return;
     }
 
+
     navIndicator.style.width =
         `${link.offsetWidth}px`;
 
+
     navIndicator.style.left =
         `${link.offsetLeft}px`;
+
 }
 
 
 function setActiveLink() {
 
     let currentSection = "home";
+
 
     const sections =
         document.querySelectorAll(
@@ -141,9 +171,17 @@ function setActiveLink() {
         const sectionTop =
             section.offsetTop - 180;
 
-        if (window.scrollY >= sectionTop) {
-            currentSection = section.id;
+
+        if (
+            window.scrollY >=
+            sectionTop
+        ) {
+
+            currentSection =
+                section.id;
+
         }
+
     });
 
 
@@ -153,19 +191,30 @@ function setActiveLink() {
             link.getAttribute("href") ===
             `#${currentSection}`;
 
+
         link.classList.toggle(
             "active",
             isActive
         );
 
+
         if (isActive) {
+
             moveIndicator(link);
+
         }
+
     });
+
 }
 
 
+/* =====================================================
+   OPTIMIZED NAVIGATION SCROLL
+===================================================== */
+
 let scrollFrame = null;
+
 
 window.addEventListener(
     "scroll",
@@ -173,44 +222,70 @@ window.addEventListener(
 
         if (scrollFrame) return;
 
+
         scrollFrame =
-            requestAnimationFrame(() => {
+            requestAnimationFrame(
+                () => {
 
-                setActiveLink();
+                    setActiveLink();
 
-                scrollFrame = null;
-            });
+                    scrollFrame = null;
+
+                }
+            );
+
     },
-    { passive: true }
+    {
+        passive: true
+    }
 );
 
 
-window.addEventListener("resize", () => {
+window.addEventListener(
+    "resize",
+    () => {
 
-    const activeLink =
-        document.querySelector(
-            ".nav-link.active"
-        );
+        const activeLink =
+            document.querySelector(
+                ".nav-link.active"
+            );
 
-    if (activeLink) {
-        moveIndicator(activeLink);
+
+        if (activeLink) {
+
+            moveIndicator(
+                activeLink
+            );
+
+        }
+
     }
-});
+);
 
 
-window.addEventListener("load", () => {
+window.addEventListener(
+    "load",
+    () => {
 
-    setActiveLink();
+        setActiveLink();
 
-    const activeLink =
-        document.querySelector(
-            ".nav-link.active"
-        );
 
-    if (activeLink) {
-        moveIndicator(activeLink);
+        const activeLink =
+            document.querySelector(
+                ".nav-link.active"
+            );
+
+
+        if (activeLink) {
+
+            moveIndicator(
+                activeLink
+            );
+
+        }
+
     }
-});
+);
 
 
 /* =====================================================
@@ -234,29 +309,44 @@ if (
         "pointermove",
         event => {
 
-            mouseX = event.clientX;
-            mouseY = event.clientY;
+            mouseX =
+                event.clientX;
+
+            mouseY =
+                event.clientY;
 
 
             if (cursorFrame) {
+
                 return;
+
             }
 
 
             cursorFrame =
-                requestAnimationFrame(() => {
+                requestAnimationFrame(
+                    () => {
 
-                    cursorGlow.style.left =
-                        `${mouseX}px`;
+                        cursorGlow.style.left =
+                            `${mouseX}px`;
 
-                    cursorGlow.style.top =
-                        `${mouseY}px`;
 
-                    cursorFrame = null;
-                });
+                        cursorGlow.style.top =
+                            `${mouseY}px`;
+
+
+                        cursorFrame =
+                            null;
+
+                    }
+                );
+
         },
-        { passive: true }
+        {
+            passive: true
+        }
     );
+
 }
 
 
@@ -270,87 +360,112 @@ if (
     ).matches
 ) {
 
-    magneticElements.forEach(element => {
+    magneticElements.forEach(
+        element => {
 
-        let magneticFrame = null;
+            let magneticFrame = null;
 
-        let mouseX = 0;
-        let mouseY = 0;
-
-
-        element.addEventListener(
-            "pointermove",
-            event => {
-
-                if (
-                    window.innerWidth <= 850
-                ) {
-                    return;
-                }
+            let mouseX = 0;
+            let mouseY = 0;
 
 
-                mouseX = event.clientX;
-                mouseY = event.clientY;
+            element.addEventListener(
+                "pointermove",
+                event => {
+
+                    if (
+                        window.innerWidth <=
+                        850
+                    ) {
+
+                        return;
+
+                    }
 
 
-                if (magneticFrame) {
-                    return;
-                }
+                    mouseX =
+                        event.clientX;
+
+                    mouseY =
+                        event.clientY;
 
 
-                magneticFrame =
-                    requestAnimationFrame(() => {
-
-                        const rect =
-                            element
-                                .getBoundingClientRect();
-
-
-                        const x =
-                            mouseX -
-                            rect.left -
-                            rect.width / 2;
-
-
-                        const y =
-                            mouseY -
-                            rect.top -
-                            rect.height / 2;
-
-
-                        element.style.transform =
-                            `translate3d(
-                                ${x * 0.18}px,
-                                ${y * 0.18}px,
-                                0
-                            )`;
-
-
-                        magneticFrame = null;
-                    });
-            }
-        );
-
-
-        element.addEventListener(
-            "pointerleave",
-            () => {
-
-                if (magneticFrame) {
-
-                    cancelAnimationFrame(
+                    if (
                         magneticFrame
-                    );
+                    ) {
 
-                    magneticFrame = null;
+                        return;
+
+                    }
+
+
+                    magneticFrame =
+                        requestAnimationFrame(
+                            () => {
+
+                                const rect =
+                                    element
+                                        .getBoundingClientRect();
+
+
+                                const x =
+                                    mouseX -
+                                    rect.left -
+                                    rect.width / 2;
+
+
+                                const y =
+                                    mouseY -
+                                    rect.top -
+                                    rect.height / 2;
+
+
+                                element.style.transform =
+                                    `translate3d(
+                                        ${x * 0.18}px,
+                                        ${y * 0.18}px,
+                                        0
+                                    )`;
+
+
+                                magneticFrame =
+                                    null;
+
+                            }
+                        );
+
                 }
+            );
 
 
-                element.style.transform =
-                    "translate3d(0, 0, 0)";
-            }
-        );
-    });
+            element.addEventListener(
+                "pointerleave",
+                () => {
+
+                    if (
+                        magneticFrame
+                    ) {
+
+                        cancelAnimationFrame(
+                            magneticFrame
+                        );
+
+
+                        magneticFrame =
+                            null;
+
+                    }
+
+
+                    element.style.transform =
+                        "translate3d(0, 0, 0)";
+
+                }
+            );
+
+        }
+    );
+
 }
 
 
@@ -364,58 +479,74 @@ if (
     ).matches
 ) {
 
-    spotlightCards.forEach(card => {
+    spotlightCards.forEach(
+        card => {
 
-        let spotlightFrame = null;
+            let spotlightFrame = null;
 
-        let mouseX = 0;
-        let mouseY = 0;
-
-
-        card.addEventListener(
-            "pointermove",
-            event => {
-
-                mouseX = event.clientX;
-                mouseY = event.clientY;
+            let mouseX = 0;
+            let mouseY = 0;
 
 
-                if (spotlightFrame) {
-                    return;
+            card.addEventListener(
+                "pointermove",
+                event => {
+
+                    mouseX =
+                        event.clientX;
+
+                    mouseY =
+                        event.clientY;
+
+
+                    if (
+                        spotlightFrame
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    spotlightFrame =
+                        requestAnimationFrame(
+                            () => {
+
+                                const rect =
+                                    card
+                                        .getBoundingClientRect();
+
+
+                                card.style.setProperty(
+                                    "--mouse-x",
+                                    `${
+                                        mouseX -
+                                        rect.left
+                                    }px`
+                                );
+
+
+                                card.style.setProperty(
+                                    "--mouse-y",
+                                    `${
+                                        mouseY -
+                                        rect.top
+                                    }px`
+                                );
+
+
+                                spotlightFrame =
+                                    null;
+
+                            }
+                        );
+
                 }
+            );
 
+        }
+    );
 
-                spotlightFrame =
-                    requestAnimationFrame(() => {
-
-                        const rect =
-                            card
-                                .getBoundingClientRect();
-
-
-                        card.style.setProperty(
-                            "--mouse-x",
-                            `${
-                                mouseX -
-                                rect.left
-                            }px`
-                        );
-
-
-                        card.style.setProperty(
-                            "--mouse-y",
-                            `${
-                                mouseY -
-                                rect.top
-                            }px`
-                        );
-
-
-                        spotlightFrame = null;
-                    });
-            }
-        );
-    });
 }
 
 
@@ -429,134 +560,164 @@ if (
     ).matches
 ) {
 
-    tiltCards.forEach(card => {
+    tiltCards.forEach(
+        card => {
 
-        let tiltFrame = null;
+            let tiltFrame = null;
 
-        let mouseX = 0;
-        let mouseY = 0;
-
-
-        card.addEventListener(
-            "pointermove",
-            event => {
-
-                if (
-                    window.innerWidth <= 850
-                ) {
-                    return;
-                }
+            let mouseX = 0;
+            let mouseY = 0;
 
 
-                mouseX = event.clientX;
-                mouseY = event.clientY;
+            card.addEventListener(
+                "pointermove",
+                event => {
+
+                    if (
+                        window.innerWidth <=
+                        850
+                    ) {
+
+                        return;
+
+                    }
 
 
-                if (tiltFrame) {
-                    return;
-                }
+                    mouseX =
+                        event.clientX;
+
+                    mouseY =
+                        event.clientY;
 
 
-                tiltFrame =
-                    requestAnimationFrame(() => {
-
-                        const rect =
-                            card
-                                .getBoundingClientRect();
-
-
-                        const centerX =
-                            rect.width / 2;
-
-
-                        const centerY =
-                            rect.height / 2;
-
-
-                        const rotateX =
-                            (
-                                (
-                                    mouseY -
-                                    rect.top -
-                                    centerY
-                                ) /
-                                centerY
-                            ) * -3;
-
-
-                        const rotateY =
-                            (
-                                (
-                                    mouseX -
-                                    rect.left -
-                                    centerX
-                                ) /
-                                centerX
-                            ) * 3;
-
-
-                        card.style.transform = `
-                            perspective(1000px)
-                            rotateX(${rotateX}deg)
-                            rotateY(${rotateY}deg)
-                            translateY(-4px)
-                        `;
-
-
-                        tiltFrame = null;
-                    });
-            }
-        );
-
-
-        card.addEventListener(
-            "pointerleave",
-            () => {
-
-                if (tiltFrame) {
-
-                    cancelAnimationFrame(
+                    if (
                         tiltFrame
-                    );
+                    ) {
 
-                    tiltFrame = null;
+                        return;
+
+                    }
+
+
+                    tiltFrame =
+                        requestAnimationFrame(
+                            () => {
+
+                                const rect =
+                                    card
+                                        .getBoundingClientRect();
+
+
+                                const centerX =
+                                    rect.width / 2;
+
+
+                                const centerY =
+                                    rect.height / 2;
+
+
+                                const rotateX =
+                                    (
+                                        (
+                                            mouseY -
+                                            rect.top -
+                                            centerY
+                                        ) /
+                                        centerY
+                                    ) * -3;
+
+
+                                const rotateY =
+                                    (
+                                        (
+                                            mouseX -
+                                            rect.left -
+                                            centerX
+                                        ) /
+                                        centerX
+                                    ) * 3;
+
+
+                                card.style.transform = `
+                                    perspective(1000px)
+                                    rotateX(${rotateX}deg)
+                                    rotateY(${rotateY}deg)
+                                    translateY(-4px)
+                                `;
+
+
+                                tiltFrame =
+                                    null;
+
+                            }
+                        );
+
                 }
+            );
 
 
-                card.style.transform = `
-                    perspective(1000px)
-                    rotateX(0deg)
-                    rotateY(0deg)
-                    translateY(0)
-                `;
-            }
-        );
-    });
+            card.addEventListener(
+                "pointerleave",
+                () => {
+
+                    if (
+                        tiltFrame
+                    ) {
+
+                        cancelAnimationFrame(
+                            tiltFrame
+                        );
+
+
+                        tiltFrame =
+                            null;
+
+                    }
+
+
+                    card.style.transform = `
+                        perspective(1000px)
+                        rotateX(0deg)
+                        rotateY(0deg)
+                        translateY(0)
+                    `;
+
+                }
+            );
+
+        }
+    );
+
 }
 
 
 /* =====================================================
-   FIXED WHOLE TEXT SCRAMBLE EFFECT
+   STABLE TEXT SCRAMBLE EFFECT
 ===================================================== */
 
-const scrambleCharacters =
+const scrambleUppercase =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+const scrambleLowercase =
+    "abcdefghijklmnopqrstuvwxyz";
+
+const scrambleNumbers =
+    "0123456789";
+
+
+/* =====================================================
+   GET TEXT NODES
+===================================================== */
 
 /*
-    Get every text node inside a scramble element.
-
-    This is important because some headings contain
-    nested <span> elements.
+    This allows the scramble effect to work
+    without destroying nested HTML elements.
 
     Example:
 
     <h2 class="scramble">
         Beyond the <span>code.</span>
     </h2>
-
-    We scramble the text nodes without destroying
-    the span or its CSS styling.
 */
 
 function getTextNodes(element) {
@@ -572,65 +733,197 @@ function getTextNodes(element) {
             NodeFilter.SHOW_TEXT,
 
             {
+
                 acceptNode(node) {
 
                     if (
-                        node.nodeValue.trim()
+                        node.nodeValue
+                            .trim()
                             .length === 0
                     ) {
 
                         return NodeFilter
                             .FILTER_REJECT;
+
                     }
 
 
                     return NodeFilter
                         .FILTER_ACCEPT;
+
                 }
+
             }
+
         );
 
 
-    while (walker.nextNode()) {
+    while (
+        walker.nextNode()
+    ) {
 
         textNodes.push({
+
             node:
                 walker.currentNode,
 
             original:
                 walker.currentNode
                     .nodeValue
+
         });
+
     }
 
 
     return textNodes;
+
 }
 
 
-/*
-    Save original text nodes once.
-*/
+/* =====================================================
+   SAVE ORIGINAL SCRAMBLE TEXT
+===================================================== */
 
-scrambleElements.forEach(element => {
+scrambleElements.forEach(
+    element => {
 
-    element._scrambleNodes =
-        getTextNodes(element);
-
-    element._scrambleRunning =
-        false;
-});
+        element._scrambleNodes =
+            getTextNodes(
+                element
+            );
 
 
-function scrambleText(element) {
+        element._scrambleRunning =
+            false;
+
+
+        element._scrambleFrame =
+            null;
+
+    }
+);
+
+
+/* =====================================================
+   GET RANDOM SCRAMBLE CHARACTER
+===================================================== */
+
+function getScrambleCharacter(
+    character
+) {
 
     /*
-        Do not start another animation while
-        the current one is still running.
+        Preserve spaces and line breaks.
     */
 
-    if (element._scrambleRunning) {
+    if (
+        /\s/.test(
+            character
+        )
+    ) {
+
+        return character;
+
+    }
+
+
+    /*
+        Preserve punctuation.
+
+        This means:
+        . , ! ? - ' etc.
+
+        will not change.
+    */
+
+    if (
+        !/[a-zA-Z0-9]/.test(
+            character
+        )
+    ) {
+
+        return character;
+
+    }
+
+
+    /*
+        Replace uppercase letters
+        only with uppercase letters.
+    */
+
+    if (
+        /[A-Z]/.test(
+            character
+        )
+    ) {
+
+        return scrambleUppercase[
+            Math.floor(
+                Math.random() *
+                scrambleUppercase.length
+            )
+        ];
+
+    }
+
+
+    /*
+        Replace lowercase letters
+        only with lowercase letters.
+    */
+
+    if (
+        /[a-z]/.test(
+            character
+        )
+    ) {
+
+        return scrambleLowercase[
+            Math.floor(
+                Math.random() *
+                scrambleLowercase.length
+            )
+        ];
+
+    }
+
+
+    /*
+        Replace numbers only
+        with other numbers.
+    */
+
+    return scrambleNumbers[
+        Math.floor(
+            Math.random() *
+            scrambleNumbers.length
+        )
+    ];
+
+}
+
+
+/* =====================================================
+   SCRAMBLE ANIMATION
+===================================================== */
+
+function scrambleText(
+    element
+) {
+
+    /*
+        Do not start another animation
+        while one is already running.
+    */
+
+    if (
+        element._scrambleRunning
+    ) {
+
         return;
+
     }
 
 
@@ -642,7 +935,9 @@ function scrambleText(element) {
         !textNodes ||
         textNodes.length === 0
     ) {
+
         return;
+
     }
 
 
@@ -651,117 +946,142 @@ function scrambleText(element) {
 
 
     /*
-        450ms gives a quick glitch effect
-        without making the UI feel slow.
+        Total scramble animation duration.
     */
 
-    const duration = 450;
-
-    const updateInterval = 45;
-
-
-    let startTime = null;
-
-    let lastUpdate = 0;
+    const duration =
+        400;
 
 
-    function createScrambledText(text) {
+    /*
+        Update approximately every 55ms.
 
-        return Array.from(text)
+        This reduces unnecessary DOM updates.
+    */
 
-            .map(character => {
-
-                /*
-                    Preserve all whitespace.
-                    This prevents layout jumping.
-                */
-
-                if (
-                    /\s/.test(character)
-                ) {
-                    return character;
-                }
+    const updateInterval =
+        55;
 
 
-                /*
-                    Replace every visible
-                    character simultaneously.
-                */
+    let startTime =
+        null;
 
-                return scrambleCharacters[
-                    Math.floor(
-                        Math.random() *
-                        scrambleCharacters.length
-                    )
-                ];
-            })
 
-            .join("");
-    }
+    let lastUpdate =
+        0;
 
+
+    /* Restore original text */
 
     function restoreText() {
 
-        textNodes.forEach(item => {
+        textNodes.forEach(
+            item => {
 
-            item.node.nodeValue =
-                item.original;
-        });
+                item.node.nodeValue =
+                    item.original;
+
+            }
+        );
 
 
         element._scrambleRunning =
             false;
 
+
         element._scrambleFrame =
             null;
+
     }
 
 
-    function animate(timestamp) {
+    /* Animation loop */
 
-        if (startTime === null) {
-            startTime = timestamp;
+    function animate(
+        timestamp
+    ) {
+
+        if (
+            startTime === null
+        ) {
+
+            startTime =
+                timestamp;
+
         }
 
 
         const elapsed =
-            timestamp - startTime;
+            timestamp -
+            startTime;
 
 
         /*
-            Update at a controlled rate instead
-            of changing DOM text every frame.
+            Generate new random characters.
         */
 
         if (
-            timestamp - lastUpdate >=
+            timestamp -
+            lastUpdate >=
             updateInterval
         ) {
 
-            textNodes.forEach(item => {
+            textNodes.forEach(
+                item => {
 
-                item.node.nodeValue =
-                    createScrambledText(
-                        item.original
-                    );
-            });
+                    item.node.nodeValue =
+                        Array.from(
+                            item.original
+                        )
+
+                            .map(
+                                character => {
+
+                                    return getScrambleCharacter(
+                                        character
+                                    );
+
+                                }
+                            )
+
+                            .join("");
+
+                }
+            );
 
 
-            lastUpdate = timestamp;
+            lastUpdate =
+                timestamp;
+
         }
 
 
-        if (elapsed < duration) {
+        /*
+            Continue animation.
+        */
+
+        if (
+            elapsed <
+            duration
+        ) {
 
             element._scrambleFrame =
                 requestAnimationFrame(
                     animate
                 );
 
-        } else {
+        }
+
+        /*
+            Animation complete.
+        */
+
+        else {
 
             restoreText();
+
         }
+
     }
 
 
@@ -769,26 +1089,37 @@ function scrambleText(element) {
         requestAnimationFrame(
             animate
         );
+
 }
 
 
-/*
-    Use pointerenter instead of mousemove.
+/* =====================================================
+   SCRAMBLE HOVER EVENT
+===================================================== */
 
-    mousemove would repeatedly trigger while
-    moving across different letters.
+/*
+    mouseenter is used instead of pointerenter.
+
+    This prevents touch interactions from
+    accidentally triggering the scramble effect.
 */
 
-scrambleElements.forEach(element => {
+scrambleElements.forEach(
+    element => {
 
-    element.addEventListener(
-        "pointerenter",
-        () => {
+        element.addEventListener(
+            "mouseenter",
+            () => {
 
-            scrambleText(element);
-        }
-    );
-});
+                scrambleText(
+                    element
+                );
+
+            }
+        );
+
+    }
+);
 
 
 /* =====================================================
@@ -796,7 +1127,8 @@ scrambleElements.forEach(element => {
 ===================================================== */
 
 if (
-    "IntersectionObserver" in window
+    "IntersectionObserver"
+    in window
 ) {
 
     const revealObserver =
@@ -804,47 +1136,62 @@ if (
 
             entries => {
 
-                entries.forEach(entry => {
+                entries.forEach(
+                    entry => {
 
-                    if (
-                        entry.isIntersecting
-                    ) {
+                        if (
+                            entry.isIntersecting
+                        ) {
 
-                        entry.target
-                            .classList.add(
-                                "visible"
-                            );
+                            entry.target
+                                .classList.add(
+                                    "visible"
+                                );
 
 
-                        revealObserver
-                            .unobserve(
-                                entry.target
-                            );
+                            revealObserver
+                                .unobserve(
+                                    entry.target
+                                );
+
+                        }
+
                     }
-                });
+                );
+
             },
 
             {
                 threshold: 0.12
             }
+
         );
 
 
-    revealElements.forEach(element => {
+    revealElements.forEach(
+        element => {
 
-        revealObserver.observe(
-            element
-        );
-    });
+            revealObserver.observe(
+                element
+            );
 
-} else {
+        }
+    );
 
-    revealElements.forEach(element => {
+}
 
-        element.classList.add(
-            "visible"
-        );
-    });
+else {
+
+    revealElements.forEach(
+        element => {
+
+            element.classList.add(
+                "visible"
+            );
+
+        }
+    );
+
 }
 
 
@@ -852,7 +1199,9 @@ if (
    CONTACT FORM
 ===================================================== */
 
-if (contactForm) {
+if (
+    contactForm
+) {
 
     contactForm.addEventListener(
         "submit",
@@ -867,8 +1216,12 @@ if (contactForm) {
                 );
 
 
-            if (!submitButton) {
+            if (
+                !submitButton
+            ) {
+
                 return;
+
             }
 
 
@@ -878,8 +1231,12 @@ if (contactForm) {
                 );
 
 
-            if (!buttonText) {
+            if (
+                !buttonText
+            ) {
+
                 return;
+
             }
 
 
@@ -895,43 +1252,57 @@ if (contactForm) {
                 true;
 
 
-            setTimeout(() => {
-
-                buttonText.textContent =
-                    "Message Sent";
-
-
-                if (formMessage) {
-
-                    formMessage.textContent =
-                        "Thanks! Your message has been prepared successfully.";
-                }
-
-
-                contactForm.reset();
-
-
-                setTimeout(() => {
+            setTimeout(
+                () => {
 
                     buttonText.textContent =
-                        originalText;
+                        "Message Sent";
 
 
-                    submitButton.disabled =
-                        false;
-
-
-                    if (formMessage) {
+                    if (
+                        formMessage
+                    ) {
 
                         formMessage.textContent =
-                            "";
+                            "Thanks! Your message has been prepared successfully.";
+
                     }
 
-                }, 3000);
 
-            }, 900);
+                    contactForm.reset();
+
+
+                    setTimeout(
+                        () => {
+
+                            buttonText.textContent =
+                                originalText;
+
+
+                            submitButton.disabled =
+                                false;
+
+
+                            if (
+                                formMessage
+                            ) {
+
+                                formMessage.textContent =
+                                    "";
+
+                            }
+
+                        },
+                        3000
+                    );
+
+                },
+                900
+            );
+
         }
     );
+
 }
 
 
@@ -945,10 +1316,14 @@ if (
     ).matches
 ) {
 
-    revealElements.forEach(element => {
+    revealElements.forEach(
+        element => {
 
-        element.classList.add(
-            "visible"
-        );
-    });
+            element.classList.add(
+                "visible"
+            );
+
+        }
+    );
+
 }
