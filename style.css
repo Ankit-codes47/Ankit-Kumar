@@ -2726,3 +2726,156 @@ ul {
         transform: none;
     }
 }
+
+/* =====================================================
+   FULLY RESPONSIVE CONTACT SECTION
+===================================================== */
+
+/* Prevent grid/flex children from overflowing */
+.contact-wrapper,
+.contact-info,
+.contact-form,
+.form-group,
+.form-row {
+    min-width: 0;
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+
+    .contact-wrapper {
+        grid-template-columns: 1fr;
+        gap: 55px;
+    }
+
+    .contact-info {
+        max-width: 700px;
+    }
+
+    .contact-form {
+        width: 100%;
+    }
+}
+
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .contact-section {
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+
+    .contact-wrapper {
+        gap: 40px;
+    }
+
+    /* Contact heading */
+    .contact-info h2 {
+        font-size: clamp(2.2rem, 12vw, 3.5rem);
+        line-height: 1.05;
+        overflow-wrap: break-word;
+    }
+
+    .contact-info > p {
+        font-size: 0.95rem;
+    }
+
+
+    /* Contact links */
+    .contact-links {
+        width: 100%;
+    }
+
+    .contact-link {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .contact-link div {
+        min-width: 0;
+    }
+
+    .contact-link strong {
+        display: block;
+
+        max-width: 100%;
+
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+
+    /* Form */
+    .contact-form {
+        width: 100%;
+
+        padding: 25px 20px;
+
+        border-radius: 20px;
+    }
+
+    /* Name and email become separate rows */
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .form-group {
+        width: 100%;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .form-group textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    /* Full-width send button */
+    .submit-btn {
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+
+/* Very small phones */
+@media (max-width: 400px) {
+
+    .contact-section .container {
+        width: min(
+            calc(100% - 24px),
+            var(--container)
+        );
+    }
+
+    .contact-info h2 {
+        font-size: 2.2rem;
+    }
+
+    .contact-form {
+        padding: 22px 15px;
+    }
+
+    .contact-link {
+        padding: 13px;
+        gap: 11px;
+    }
+
+    .contact-link > span {
+        flex-shrink: 0;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 16px;
+    }
+}
