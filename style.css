@@ -1303,6 +1303,12 @@ ul {
     padding: 45px;
 }
 
+.college-content h3.scramble {
+    min-height: 2.2em;
+    overflow-wrap: normal;
+    word-break: keep-all;
+}
+
 .college-tag {
     display: inline-flex;
     align-items: center;

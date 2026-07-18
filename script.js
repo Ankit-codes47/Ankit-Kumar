@@ -15,7 +15,6 @@ const spotlightCards = document.querySelectorAll(".spotlight");
 const tiltCards = document.querySelectorAll(".tilt-card");
 
 const scrambleElements = document.querySelectorAll(".scramble");
-
 const revealElements = document.querySelectorAll(".reveal");
 
 const contactForm = document.querySelector("#contact-form");
@@ -41,16 +40,17 @@ function updateNavbar() {
 
     if (!header) return;
 
-    if (window.scrollY > 60) {
-        header.classList.add("scrolled");
-    } else {
-        header.classList.remove("scrolled");
-    }
+    header.classList.toggle(
+        "scrolled",
+        window.scrollY > 60
+    );
 }
 
-window.addEventListener("scroll", updateNavbar, {
-    passive: true
-});
+window.addEventListener(
+    "scroll",
+    updateNavbar,
+    { passive: true }
+);
 
 updateNavbar();
 
@@ -66,7 +66,10 @@ if (menuToggle && navMenu) {
         const isOpen =
             navMenu.classList.toggle("active");
 
-        menuToggle.classList.toggle("active");
+        menuToggle.classList.toggle(
+            "active",
+            isOpen
+        );
 
         document.body.classList.toggle(
             "menu-open",
@@ -127,42 +130,58 @@ function setActiveLink() {
 
     let currentSection = "home";
 
-    document
-        .querySelectorAll("main section[id]")
-        .forEach(section => {
+    const sections =
+        document.querySelectorAll(
+            "main section[id]"
+        );
 
-            const sectionTop =
-                section.offsetTop - 180;
 
-            if (window.scrollY >= sectionTop) {
-                currentSection = section.id;
-            }
-        });
+    sections.forEach(section => {
+
+        const sectionTop =
+            section.offsetTop - 180;
+
+        if (window.scrollY >= sectionTop) {
+            currentSection = section.id;
+        }
+    });
 
 
     navLinks.forEach(link => {
 
-        link.classList.remove("active");
-
-        if (
+        const isActive =
             link.getAttribute("href") ===
-            `#${currentSection}`
-        ) {
+            `#${currentSection}`;
 
-            link.classList.add("active");
+        link.classList.toggle(
+            "active",
+            isActive
+        );
 
+        if (isActive) {
             moveIndicator(link);
         }
     });
 }
 
 
+let scrollFrame = null;
+
 window.addEventListener(
     "scroll",
-    setActiveLink,
-    {
-        passive: true
-    }
+    () => {
+
+        if (scrollFrame) return;
+
+        scrollFrame =
+            requestAnimationFrame(() => {
+
+                setActiveLink();
+
+                scrollFrame = null;
+            });
+    },
+    { passive: true }
 );
 
 
@@ -181,54 +200,62 @@ window.addEventListener("resize", () => {
 
 window.addEventListener("load", () => {
 
-    const initialActiveLink =
+    setActiveLink();
+
+    const activeLink =
         document.querySelector(
             ".nav-link.active"
         );
 
-    if (initialActiveLink) {
-        moveIndicator(initialActiveLink);
+    if (activeLink) {
+        moveIndicator(activeLink);
     }
-
-    setActiveLink();
 });
 
 
 /* =====================================================
-   OPTIMIZED CURSOR GLOW
+   CURSOR GLOW
 ===================================================== */
 
-if (cursorGlow) {
+if (
+    cursorGlow &&
+    window.matchMedia(
+        "(pointer: fine)"
+    ).matches
+) {
 
     let cursorFrame = null;
+
     let mouseX = 0;
     let mouseY = 0;
 
+
     document.addEventListener(
-        "mousemove",
+        "pointermove",
         event => {
 
             mouseX = event.clientX;
             mouseY = event.clientY;
 
-            if (cursorFrame) return;
+
+            if (cursorFrame) {
+                return;
+            }
+
 
             cursorFrame =
                 requestAnimationFrame(() => {
 
-                    cursorGlow.style.transform =
-                        `translate3d(
-                            ${mouseX}px,
-                            ${mouseY}px,
-                            0
-                        )`;
+                    cursorGlow.style.left =
+                        `${mouseX}px`;
+
+                    cursorGlow.style.top =
+                        `${mouseY}px`;
 
                     cursorFrame = null;
                 });
         },
-        {
-            passive: true
-        }
+        { passive: true }
     );
 }
 
@@ -237,317 +264,525 @@ if (cursorGlow) {
    MAGNETIC HOVER EFFECT
 ===================================================== */
 
-magneticElements.forEach(element => {
+if (
+    window.matchMedia(
+        "(pointer: fine)"
+    ).matches
+) {
 
-    element.addEventListener(
-        "mousemove",
-        event => {
+    magneticElements.forEach(element => {
 
-            if (window.innerWidth <= 850) {
-                return;
+        let magneticFrame = null;
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+
+        element.addEventListener(
+            "pointermove",
+            event => {
+
+                if (
+                    window.innerWidth <= 850
+                ) {
+                    return;
+                }
+
+
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+
+
+                if (magneticFrame) {
+                    return;
+                }
+
+
+                magneticFrame =
+                    requestAnimationFrame(() => {
+
+                        const rect =
+                            element
+                                .getBoundingClientRect();
+
+
+                        const x =
+                            mouseX -
+                            rect.left -
+                            rect.width / 2;
+
+
+                        const y =
+                            mouseY -
+                            rect.top -
+                            rect.height / 2;
+
+
+                        element.style.transform =
+                            `translate3d(
+                                ${x * 0.18}px,
+                                ${y * 0.18}px,
+                                0
+                            )`;
+
+
+                        magneticFrame = null;
+                    });
             }
-
-            const rect =
-                element.getBoundingClientRect();
-
-            const x =
-                event.clientX -
-                rect.left -
-                rect.width / 2;
-
-            const y =
-                event.clientY -
-                rect.top -
-                rect.height / 2;
-
-            element.style.transform =
-                `translate3d(
-                    ${x * 0.18}px,
-                    ${y * 0.18}px,
-                    0
-                )`;
-        }
-    );
+        );
 
 
-    element.addEventListener(
-        "mouseleave",
-        () => {
+        element.addEventListener(
+            "pointerleave",
+            () => {
 
-            element.style.transform =
-                "translate3d(0, 0, 0)";
-        }
-    );
-});
+                if (magneticFrame) {
+
+                    cancelAnimationFrame(
+                        magneticFrame
+                    );
+
+                    magneticFrame = null;
+                }
+
+
+                element.style.transform =
+                    "translate3d(0, 0, 0)";
+            }
+        );
+    });
+}
 
 
 /* =====================================================
-   MOUSE-TRACKING CARD SPOTLIGHT
+   CARD SPOTLIGHT EFFECT
 ===================================================== */
 
-spotlightCards.forEach(card => {
+if (
+    window.matchMedia(
+        "(pointer: fine)"
+    ).matches
+) {
 
-    let spotlightFrame = null;
+    spotlightCards.forEach(card => {
 
-    card.addEventListener(
-        "mousemove",
-        event => {
+        let spotlightFrame = null;
 
-            if (spotlightFrame) {
-                return;
+        let mouseX = 0;
+        let mouseY = 0;
+
+
+        card.addEventListener(
+            "pointermove",
+            event => {
+
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+
+
+                if (spotlightFrame) {
+                    return;
+                }
+
+
+                spotlightFrame =
+                    requestAnimationFrame(() => {
+
+                        const rect =
+                            card
+                                .getBoundingClientRect();
+
+
+                        card.style.setProperty(
+                            "--mouse-x",
+                            `${
+                                mouseX -
+                                rect.left
+                            }px`
+                        );
+
+
+                        card.style.setProperty(
+                            "--mouse-y",
+                            `${
+                                mouseY -
+                                rect.top
+                            }px`
+                        );
+
+
+                        spotlightFrame = null;
+                    });
             }
-
-            spotlightFrame =
-                requestAnimationFrame(() => {
-
-                    const rect =
-                        card.getBoundingClientRect();
-
-                    const x =
-                        event.clientX -
-                        rect.left;
-
-                    const y =
-                        event.clientY -
-                        rect.top;
-
-                    card.style.setProperty(
-                        "--mouse-x",
-                        `${x}px`
-                    );
-
-                    card.style.setProperty(
-                        "--mouse-y",
-                        `${y}px`
-                    );
-
-                    spotlightFrame = null;
-                });
-        }
-    );
-});
+        );
+    });
+}
 
 
 /* =====================================================
-   3D PROJECT CARD TILT
+   PROJECT CARD 3D TILT
 ===================================================== */
 
-tiltCards.forEach(card => {
+if (
+    window.matchMedia(
+        "(pointer: fine)"
+    ).matches
+) {
 
-    let tiltFrame = null;
+    tiltCards.forEach(card => {
 
-    card.addEventListener(
-        "mousemove",
-        event => {
+        let tiltFrame = null;
 
-            if (
-                window.innerWidth <= 850 ||
-                tiltFrame
-            ) {
-                return;
+        let mouseX = 0;
+        let mouseY = 0;
+
+
+        card.addEventListener(
+            "pointermove",
+            event => {
+
+                if (
+                    window.innerWidth <= 850
+                ) {
+                    return;
+                }
+
+
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+
+
+                if (tiltFrame) {
+                    return;
+                }
+
+
+                tiltFrame =
+                    requestAnimationFrame(() => {
+
+                        const rect =
+                            card
+                                .getBoundingClientRect();
+
+
+                        const centerX =
+                            rect.width / 2;
+
+
+                        const centerY =
+                            rect.height / 2;
+
+
+                        const rotateX =
+                            (
+                                (
+                                    mouseY -
+                                    rect.top -
+                                    centerY
+                                ) /
+                                centerY
+                            ) * -3;
+
+
+                        const rotateY =
+                            (
+                                (
+                                    mouseX -
+                                    rect.left -
+                                    centerX
+                                ) /
+                                centerX
+                            ) * 3;
+
+
+                        card.style.transform = `
+                            perspective(1000px)
+                            rotateX(${rotateX}deg)
+                            rotateY(${rotateY}deg)
+                            translateY(-4px)
+                        `;
+
+
+                        tiltFrame = null;
+                    });
             }
+        );
 
-            tiltFrame =
-                requestAnimationFrame(() => {
 
-                    const rect =
-                        card.getBoundingClientRect();
+        card.addEventListener(
+            "pointerleave",
+            () => {
 
-                    const mouseX =
-                        event.clientX -
-                        rect.left;
+                if (tiltFrame) {
 
-                    const mouseY =
-                        event.clientY -
-                        rect.top;
-
-                    const centerX =
-                        rect.width / 2;
-
-                    const centerY =
-                        rect.height / 2;
-
-                    const rotateX =
-                        (
-                            (mouseY - centerY) /
-                            centerY
-                        ) * -3;
-
-                    const rotateY =
-                        (
-                            (mouseX - centerX) /
-                            centerX
-                        ) * 3;
-
-                    card.style.transform = `
-                        perspective(1000px)
-                        rotateX(${rotateX}deg)
-                        rotateY(${rotateY}deg)
-                        translateY(-4px)
-                    `;
+                    cancelAnimationFrame(
+                        tiltFrame
+                    );
 
                     tiltFrame = null;
-                });
-        }
-    );
+                }
 
 
-    card.addEventListener(
-        "mouseleave",
-        () => {
-
-            if (tiltFrame) {
-                cancelAnimationFrame(
-                    tiltFrame
-                );
-
-                tiltFrame = null;
+                card.style.transform = `
+                    perspective(1000px)
+                    rotateX(0deg)
+                    rotateY(0deg)
+                    translateY(0)
+                `;
             }
-
-            card.style.transform = `
-                perspective(1000px)
-                rotateX(0deg)
-                rotateY(0deg)
-                translateY(0)
-            `;
-        }
-    );
-});
+        );
+    });
+}
 
 
 /* =====================================================
-   OPTIMIZED TEXT SCRAMBLE EFFECT
+   FIXED WHOLE TEXT SCRAMBLE EFFECT
 ===================================================== */
 
 const scrambleCharacters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+/*
+    Get every text node inside a scramble element.
+
+    This is important because some headings contain
+    nested <span> elements.
+
+    Example:
+
+    <h2 class="scramble">
+        Beyond the <span>code.</span>
+    </h2>
+
+    We scramble the text nodes without destroying
+    the span or its CSS styling.
+*/
+
+function getTextNodes(element) {
+
+    const textNodes = [];
+
+
+    const walker =
+        document.createTreeWalker(
+
+            element,
+
+            NodeFilter.SHOW_TEXT,
+
+            {
+                acceptNode(node) {
+
+                    if (
+                        node.nodeValue.trim()
+                            .length === 0
+                    ) {
+
+                        return NodeFilter
+                            .FILTER_REJECT;
+                    }
+
+
+                    return NodeFilter
+                        .FILTER_ACCEPT;
+                }
+            }
+        );
+
+
+    while (walker.nextNode()) {
+
+        textNodes.push({
+            node:
+                walker.currentNode,
+
+            original:
+                walker.currentNode
+                    .nodeValue
+        });
+    }
+
+
+    return textNodes;
+}
+
+
+/*
+    Save original text nodes once.
+*/
+
+scrambleElements.forEach(element => {
+
+    element._scrambleNodes =
+        getTextNodes(element);
+
+    element._scrambleRunning =
+        false;
+});
 
 
 function scrambleText(element) {
 
     /*
-        Prevent the animation from restarting
-        while it is already running.
+        Do not start another animation while
+        the current one is still running.
     */
 
-    if (element.scrambleFrame) {
+    if (element._scrambleRunning) {
         return;
     }
 
 
-    const originalText =
-        element.dataset.originalText ||
-        element.textContent;
-
-    element.dataset.originalText =
-        originalText;
+    const textNodes =
+        element._scrambleNodes;
 
 
-    let iteration = 0;
+    if (
+        !textNodes ||
+        textNodes.length === 0
+    ) {
+        return;
+    }
+
+
+    element._scrambleRunning =
+        true;
+
+
+    /*
+        450ms gives a quick glitch effect
+        without making the UI feel slow.
+    */
+
+    const duration = 450;
+
+    const updateInterval = 45;
+
+
+    let startTime = null;
 
     let lastUpdate = 0;
 
 
+    function createScrambledText(text) {
+
+        return Array.from(text)
+
+            .map(character => {
+
+                /*
+                    Preserve all whitespace.
+                    This prevents layout jumping.
+                */
+
+                if (
+                    /\s/.test(character)
+                ) {
+                    return character;
+                }
+
+
+                /*
+                    Replace every visible
+                    character simultaneously.
+                */
+
+                return scrambleCharacters[
+                    Math.floor(
+                        Math.random() *
+                        scrambleCharacters.length
+                    )
+                ];
+            })
+
+            .join("");
+    }
+
+
+    function restoreText() {
+
+        textNodes.forEach(item => {
+
+            item.node.nodeValue =
+                item.original;
+        });
+
+
+        element._scrambleRunning =
+            false;
+
+        element._scrambleFrame =
+            null;
+    }
+
+
     function animate(timestamp) {
 
+        if (startTime === null) {
+            startTime = timestamp;
+        }
+
+
+        const elapsed =
+            timestamp - startTime;
+
+
         /*
-            Update the text around 25 times
-            per second instead of every frame.
+            Update at a controlled rate instead
+            of changing DOM text every frame.
         */
 
-        if (timestamp - lastUpdate >= 40) {
+        if (
+            timestamp - lastUpdate >=
+            updateInterval
+        ) {
 
-            element.textContent =
-                originalText
-                    .split("")
-                    .map(
-                        (
-                            character,
-                            index
-                        ) => {
+            textNodes.forEach(item => {
 
-                            /*
-                                Keep spaces
-                                unchanged.
-                            */
+                item.node.nodeValue =
+                    createScrambledText(
+                        item.original
+                    );
+            });
 
-                            if (
-                                character === " "
-                            ) {
-                                return " ";
-                            }
-
-
-                            /*
-                                Keep revealed
-                                characters.
-                            */
-
-                            if (
-                                index <
-                                iteration
-                            ) {
-                                return originalText[
-                                    index
-                                ];
-                            }
-
-
-                            /*
-                                Generate random
-                                scramble character.
-                            */
-
-                            return scrambleCharacters[
-                                Math.floor(
-                                    Math.random() *
-                                    scrambleCharacters
-                                        .length
-                                )
-                            ];
-                        }
-                    )
-                    .join("");
-
-
-            iteration += 0.5;
 
             lastUpdate = timestamp;
         }
 
 
-        if (
-            iteration <
-            originalText.length
-        ) {
+        if (elapsed < duration) {
 
-            element.scrambleFrame =
+            element._scrambleFrame =
                 requestAnimationFrame(
                     animate
                 );
 
         } else {
 
-            element.textContent =
-                originalText;
-
-            element.scrambleFrame =
-                null;
+            restoreText();
         }
     }
 
 
-    element.scrambleFrame =
+    element._scrambleFrame =
         requestAnimationFrame(
             animate
         );
 }
 
 
+/*
+    Use pointerenter instead of mousemove.
+
+    mousemove would repeatedly trigger while
+    moving across different letters.
+*/
+
 scrambleElements.forEach(element => {
 
     element.addEventListener(
-        "mouseenter",
+        "pointerenter",
         () => {
 
             scrambleText(element);
@@ -566,6 +801,7 @@ if (
 
     const revealObserver =
         new IntersectionObserver(
+
             entries => {
 
                 entries.forEach(entry => {
@@ -579,6 +815,7 @@ if (
                                 "visible"
                             );
 
+
                         revealObserver
                             .unobserve(
                                 entry.target
@@ -586,6 +823,7 @@ if (
                     }
                 });
             },
+
             {
                 threshold: 0.12
             }
@@ -600,11 +838,6 @@ if (
     });
 
 } else {
-
-    /*
-        Fallback for browsers without
-        IntersectionObserver support.
-    */
 
     revealElements.forEach(element => {
 
@@ -633,6 +866,7 @@ if (contactForm) {
                     ".submit-btn"
                 );
 
+
             if (!submitButton) {
                 return;
             }
@@ -642,6 +876,7 @@ if (contactForm) {
                 submitButton.querySelector(
                     "span"
                 );
+
 
             if (!buttonText) {
                 return;
@@ -654,6 +889,7 @@ if (contactForm) {
 
             buttonText.textContent =
                 "Sending...";
+
 
             submitButton.disabled =
                 true;
@@ -680,6 +916,7 @@ if (contactForm) {
                     buttonText.textContent =
                         originalText;
 
+
                     submitButton.disabled =
                         false;
 
@@ -695,4 +932,23 @@ if (contactForm) {
             }, 900);
         }
     );
+}
+
+
+/* =====================================================
+   REDUCED MOTION SUPPORT
+===================================================== */
+
+if (
+    window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches
+) {
+
+    revealElements.forEach(element => {
+
+        element.classList.add(
+            "visible"
+        );
+    });
 }
