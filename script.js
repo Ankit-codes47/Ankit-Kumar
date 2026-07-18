@@ -28,7 +28,9 @@ const currentYear = document.querySelector("#current-year");
    CURRENT YEAR
 ===================================================== */
 
-currentYear.textContent = new Date().getFullYear();
+if (currentYear) {
+    currentYear.textContent = new Date().getFullYear();
+}
 
 
 /* =====================================================
@@ -37,15 +39,18 @@ currentYear.textContent = new Date().getFullYear();
 
 function updateNavbar() {
 
+    if (!header) return;
+
     if (window.scrollY > 60) {
         header.classList.add("scrolled");
     } else {
         header.classList.remove("scrolled");
     }
-
 }
 
-window.addEventListener("scroll", updateNavbar);
+window.addEventListener("scroll", updateNavbar, {
+    passive: true
+});
 
 updateNavbar();
 
@@ -54,40 +59,46 @@ updateNavbar();
    MOBILE MENU
 ===================================================== */
 
-menuToggle.addEventListener("click", () => {
+if (menuToggle && navMenu) {
 
-    const isOpen = navMenu.classList.toggle("active");
+    menuToggle.addEventListener("click", () => {
 
-    menuToggle.classList.toggle("active");
+        const isOpen =
+            navMenu.classList.toggle("active");
 
-    document.body.classList.toggle("menu-open", isOpen);
+        menuToggle.classList.toggle("active");
 
-    menuToggle.setAttribute(
-        "aria-expanded",
-        String(isOpen)
-    );
-
-});
-
-
-navLinks.forEach(link => {
-
-    link.addEventListener("click", () => {
-
-        navMenu.classList.remove("active");
-
-        menuToggle.classList.remove("active");
-
-        document.body.classList.remove("menu-open");
+        document.body.classList.toggle(
+            "menu-open",
+            isOpen
+        );
 
         menuToggle.setAttribute(
             "aria-expanded",
-            "false"
+            String(isOpen)
         );
-
     });
 
-});
+
+    navLinks.forEach(link => {
+
+        link.addEventListener("click", () => {
+
+            navMenu.classList.remove("active");
+
+            menuToggle.classList.remove("active");
+
+            document.body.classList.remove(
+                "menu-open"
+            );
+
+            menuToggle.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        });
+    });
+}
 
 
 /* =====================================================
@@ -96,13 +107,19 @@ navLinks.forEach(link => {
 
 function moveIndicator(link) {
 
-    if (!navIndicator || window.innerWidth <= 850) {
+    if (
+        !navIndicator ||
+        !link ||
+        window.innerWidth <= 850
+    ) {
         return;
     }
 
-    navIndicator.style.width = `${link.offsetWidth}px`;
-    navIndicator.style.left = `${link.offsetLeft}px`;
+    navIndicator.style.width =
+        `${link.offsetWidth}px`;
 
+    navIndicator.style.left =
+        `${link.offsetLeft}px`;
 }
 
 
@@ -110,15 +127,17 @@ function setActiveLink() {
 
     let currentSection = "home";
 
-    document.querySelectorAll("main section[id]").forEach(section => {
+    document
+        .querySelectorAll("main section[id]")
+        .forEach(section => {
 
-        const sectionTop = section.offsetTop - 180;
+            const sectionTop =
+                section.offsetTop - 180;
 
-        if (window.scrollY >= sectionTop) {
-            currentSection = section.id;
-        }
-
-    });
+            if (window.scrollY >= sectionTop) {
+                currentSection = section.id;
+            }
+        });
 
 
     navLinks.forEach(link => {
@@ -133,54 +152,85 @@ function setActiveLink() {
             link.classList.add("active");
 
             moveIndicator(link);
-
         }
-
     });
-
 }
 
 
-window.addEventListener("scroll", setActiveLink);
+window.addEventListener(
+    "scroll",
+    setActiveLink,
+    {
+        passive: true
+    }
+);
+
 
 window.addEventListener("resize", () => {
 
     const activeLink =
-        document.querySelector(".nav-link.active");
+        document.querySelector(
+            ".nav-link.active"
+        );
 
     if (activeLink) {
         moveIndicator(activeLink);
     }
-
 });
 
 
-const initialActiveLink =
-    document.querySelector(".nav-link.active");
+window.addEventListener("load", () => {
 
-if (initialActiveLink) {
+    const initialActiveLink =
+        document.querySelector(
+            ".nav-link.active"
+        );
 
-    window.addEventListener("load", () => {
+    if (initialActiveLink) {
         moveIndicator(initialActiveLink);
-    });
+    }
 
-}
+    setActiveLink();
+});
 
 
 /* =====================================================
-   CURSOR GLOW
+   OPTIMIZED CURSOR GLOW
 ===================================================== */
 
-document.addEventListener("mousemove", event => {
+if (cursorGlow) {
 
-    if (!cursorGlow) {
-        return;
-    }
+    let cursorFrame = null;
+    let mouseX = 0;
+    let mouseY = 0;
 
-    cursorGlow.style.left = `${event.clientX}px`;
-    cursorGlow.style.top = `${event.clientY}px`;
+    document.addEventListener(
+        "mousemove",
+        event => {
 
-});
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+
+            if (cursorFrame) return;
+
+            cursorFrame =
+                requestAnimationFrame(() => {
+
+                    cursorGlow.style.transform =
+                        `translate3d(
+                            ${mouseX}px,
+                            ${mouseY}px,
+                            0
+                        )`;
+
+                    cursorFrame = null;
+                });
+        },
+        {
+            passive: true
+        }
+    );
+}
 
 
 /* =====================================================
@@ -189,42 +239,45 @@ document.addEventListener("mousemove", event => {
 
 magneticElements.forEach(element => {
 
-    element.addEventListener("mousemove", event => {
+    element.addEventListener(
+        "mousemove",
+        event => {
 
-        /*
-            Disable magnetic movement on touch-sized
-            screens to avoid awkward interaction.
-        */
+            if (window.innerWidth <= 850) {
+                return;
+            }
 
-        if (window.innerWidth <= 850) {
-            return;
+            const rect =
+                element.getBoundingClientRect();
+
+            const x =
+                event.clientX -
+                rect.left -
+                rect.width / 2;
+
+            const y =
+                event.clientY -
+                rect.top -
+                rect.height / 2;
+
+            element.style.transform =
+                `translate3d(
+                    ${x * 0.18}px,
+                    ${y * 0.18}px,
+                    0
+                )`;
         }
-
-        const rect = element.getBoundingClientRect();
-
-        const x =
-            event.clientX -
-            rect.left -
-            rect.width / 2;
-
-        const y =
-            event.clientY -
-            rect.top -
-            rect.height / 2;
-
-        element.style.transform =
-            `translate(${x * 0.18}px, ${y * 0.18}px)`;
-
-    });
+    );
 
 
-    element.addEventListener("mouseleave", () => {
+    element.addEventListener(
+        "mouseleave",
+        () => {
 
-        element.style.transform =
-            "translate(0px, 0px)";
-
-    });
-
+            element.style.transform =
+                "translate3d(0, 0, 0)";
+        }
+    );
 });
 
 
@@ -234,30 +287,44 @@ magneticElements.forEach(element => {
 
 spotlightCards.forEach(card => {
 
-    card.addEventListener("mousemove", event => {
+    let spotlightFrame = null;
 
-        const rect = card.getBoundingClientRect();
+    card.addEventListener(
+        "mousemove",
+        event => {
 
-        const x =
-            event.clientX -
-            rect.left;
+            if (spotlightFrame) {
+                return;
+            }
 
-        const y =
-            event.clientY -
-            rect.top;
+            spotlightFrame =
+                requestAnimationFrame(() => {
 
-        card.style.setProperty(
-            "--mouse-x",
-            `${x}px`
-        );
+                    const rect =
+                        card.getBoundingClientRect();
 
-        card.style.setProperty(
-            "--mouse-y",
-            `${y}px`
-        );
+                    const x =
+                        event.clientX -
+                        rect.left;
 
-    });
+                    const y =
+                        event.clientY -
+                        rect.top;
 
+                    card.style.setProperty(
+                        "--mouse-x",
+                        `${x}px`
+                    );
+
+                    card.style.setProperty(
+                        "--mouse-y",
+                        `${y}px`
+                    );
+
+                    spotlightFrame = null;
+                });
+        }
+    );
 });
 
 
@@ -267,62 +334,89 @@ spotlightCards.forEach(card => {
 
 tiltCards.forEach(card => {
 
-    card.addEventListener("mousemove", event => {
+    let tiltFrame = null;
 
-        if (window.innerWidth <= 850) {
-            return;
+    card.addEventListener(
+        "mousemove",
+        event => {
+
+            if (
+                window.innerWidth <= 850 ||
+                tiltFrame
+            ) {
+                return;
+            }
+
+            tiltFrame =
+                requestAnimationFrame(() => {
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+                    const mouseX =
+                        event.clientX -
+                        rect.left;
+
+                    const mouseY =
+                        event.clientY -
+                        rect.top;
+
+                    const centerX =
+                        rect.width / 2;
+
+                    const centerY =
+                        rect.height / 2;
+
+                    const rotateX =
+                        (
+                            (mouseY - centerY) /
+                            centerY
+                        ) * -3;
+
+                    const rotateY =
+                        (
+                            (mouseX - centerX) /
+                            centerX
+                        ) * 3;
+
+                    card.style.transform = `
+                        perspective(1000px)
+                        rotateX(${rotateX}deg)
+                        rotateY(${rotateY}deg)
+                        translateY(-4px)
+                    `;
+
+                    tiltFrame = null;
+                });
         }
-
-        const rect =
-            card.getBoundingClientRect();
-
-        const mouseX =
-            event.clientX -
-            rect.left;
-
-        const mouseY =
-            event.clientY -
-            rect.top;
-
-        const centerX =
-            rect.width / 2;
-
-        const centerY =
-            rect.height / 2;
-
-        const rotateX =
-            ((mouseY - centerY) / centerY) * -3;
-
-        const rotateY =
-            ((mouseX - centerX) / centerX) * 3;
+    );
 
 
-        card.style.transform = `
-            perspective(1000px)
-            rotateX(${rotateX}deg)
-            rotateY(${rotateY}deg)
-            translateY(-4px)
-        `;
+    card.addEventListener(
+        "mouseleave",
+        () => {
 
-    });
+            if (tiltFrame) {
+                cancelAnimationFrame(
+                    tiltFrame
+                );
 
+                tiltFrame = null;
+            }
 
-    card.addEventListener("mouseleave", () => {
-
-        card.style.transform = `
-            perspective(1000px)
-            rotateX(0deg)
-            rotateY(0deg)
-            translateY(0)
-        `;
-
-    });
-
+            card.style.transform = `
+                perspective(1000px)
+                rotateX(0deg)
+                rotateY(0deg)
+                translateY(0)
+            `;
+        }
+    );
 });
 
 
 /* =====================================================
-   TEXT SCRAMBLE EFFECT
+   OPTIMIZED TEXT SCRAMBLE EFFECT
 ===================================================== */
 
 const scrambleCharacters =
@@ -332,15 +426,14 @@ const scrambleCharacters =
 function scrambleText(element) {
 
     /*
-        Prevent several animations from running
-        on the same element simultaneously.
+        Prevent the animation from restarting
+        while it is already running.
     */
 
-    if (element.dataset.scrambling === "true") {
+    if (element.scrambleFrame) {
         return;
     }
 
-    element.dataset.scrambling = "true";
 
     const originalText =
         element.dataset.originalText ||
@@ -352,50 +445,102 @@ function scrambleText(element) {
 
     let iteration = 0;
 
-
-    const interval = setInterval(() => {
-
-        element.textContent =
-            originalText
-                .split("")
-                .map((character, index) => {
-
-                    if (character === " ") {
-                        return " ";
-                    }
-
-                    if (index < iteration) {
-                        return originalText[index];
-                    }
-
-                    return scrambleCharacters[
-                        Math.floor(
-                            Math.random() *
-                            scrambleCharacters.length
-                        )
-                    ];
-
-                })
-                .join("");
+    let lastUpdate = 0;
 
 
-        iteration += 1 / 3;
+    function animate(timestamp) {
+
+        /*
+            Update the text around 25 times
+            per second instead of every frame.
+        */
+
+        if (timestamp - lastUpdate >= 40) {
+
+            element.textContent =
+                originalText
+                    .split("")
+                    .map(
+                        (
+                            character,
+                            index
+                        ) => {
+
+                            /*
+                                Keep spaces
+                                unchanged.
+                            */
+
+                            if (
+                                character === " "
+                            ) {
+                                return " ";
+                            }
 
 
-        if (iteration >= originalText.length) {
+                            /*
+                                Keep revealed
+                                characters.
+                            */
 
-            clearInterval(interval);
+                            if (
+                                index <
+                                iteration
+                            ) {
+                                return originalText[
+                                    index
+                                ];
+                            }
+
+
+                            /*
+                                Generate random
+                                scramble character.
+                            */
+
+                            return scrambleCharacters[
+                                Math.floor(
+                                    Math.random() *
+                                    scrambleCharacters
+                                        .length
+                                )
+                            ];
+                        }
+                    )
+                    .join("");
+
+
+            iteration += 0.5;
+
+            lastUpdate = timestamp;
+        }
+
+
+        if (
+            iteration <
+            originalText.length
+        ) {
+
+            element.scrambleFrame =
+                requestAnimationFrame(
+                    animate
+                );
+
+        } else {
 
             element.textContent =
                 originalText;
 
-            element.dataset.scrambling =
-                "false";
-
+            element.scrambleFrame =
+                null;
         }
+    }
 
-    }, 25);
 
+    element.scrambleFrame =
+        requestAnimationFrame(
+            animate
+        );
 }
 
 
@@ -403,9 +548,11 @@ scrambleElements.forEach(element => {
 
     element.addEventListener(
         "mouseenter",
-        () => scrambleText(element)
-    );
+        () => {
 
+            scrambleText(element);
+        }
+    );
 });
 
 
@@ -413,99 +560,139 @@ scrambleElements.forEach(element => {
    SCROLL REVEAL ANIMATION
 ===================================================== */
 
-const revealObserver =
-    new IntersectionObserver(
-        entries => {
+if (
+    "IntersectionObserver" in window
+) {
 
-            entries.forEach(entry => {
+    const revealObserver =
+        new IntersectionObserver(
+            entries => {
 
-                if (entry.isIntersecting) {
+                entries.forEach(entry => {
 
-                    entry.target.classList.add(
-                        "visible"
-                    );
+                    if (
+                        entry.isIntersecting
+                    ) {
 
-                    revealObserver.unobserve(
                         entry.target
-                    );
+                            .classList.add(
+                                "visible"
+                            );
 
-                }
+                        revealObserver
+                            .unobserve(
+                                entry.target
+                            );
+                    }
+                });
+            },
+            {
+                threshold: 0.12
+            }
+        );
 
-            });
 
-        },
-        {
-            threshold: 0.12
-        }
-    );
+    revealElements.forEach(element => {
 
+        revealObserver.observe(
+            element
+        );
+    });
 
-revealElements.forEach(element => {
+} else {
 
-    revealObserver.observe(element);
+    /*
+        Fallback for browsers without
+        IntersectionObserver support.
+    */
 
-});
+    revealElements.forEach(element => {
+
+        element.classList.add(
+            "visible"
+        );
+    });
+}
 
 
 /* =====================================================
    CONTACT FORM
 ===================================================== */
 
-/*
-    This demonstration handles the form only on
-    the front end.
+if (contactForm) {
 
-    To actually receive emails, connect it to:
-    - Formspree
-    - EmailJS
-    - Your own backend API
-*/
+    contactForm.addEventListener(
+        "submit",
+        event => {
 
-contactForm.addEventListener("submit", event => {
-
-    event.preventDefault();
-
-    const submitButton =
-        contactForm.querySelector(".submit-btn");
-
-    const buttonText =
-        submitButton.querySelector("span");
-
-    const originalText =
-        buttonText.textContent;
+            event.preventDefault();
 
 
-    buttonText.textContent =
-        "Sending...";
+            const submitButton =
+                contactForm.querySelector(
+                    ".submit-btn"
+                );
 
-    submitButton.disabled =
-        true;
-
-
-    setTimeout(() => {
-
-        buttonText.textContent =
-            "Message Sent";
-
-        formMessage.textContent =
-            "Thanks! Your message has been prepared successfully.";
-
-        contactForm.reset();
+            if (!submitButton) {
+                return;
+            }
 
 
-        setTimeout(() => {
+            const buttonText =
+                submitButton.querySelector(
+                    "span"
+                );
+
+            if (!buttonText) {
+                return;
+            }
+
+
+            const originalText =
+                buttonText.textContent;
+
 
             buttonText.textContent =
-                originalText;
+                "Sending...";
 
             submitButton.disabled =
-                false;
+                true;
 
-            formMessage.textContent =
-                "";
 
-        }, 3000);
+            setTimeout(() => {
 
-    }, 900);
+                buttonText.textContent =
+                    "Message Sent";
 
-});
+
+                if (formMessage) {
+
+                    formMessage.textContent =
+                        "Thanks! Your message has been prepared successfully.";
+                }
+
+
+                contactForm.reset();
+
+
+                setTimeout(() => {
+
+                    buttonText.textContent =
+                        originalText;
+
+                    submitButton.disabled =
+                        false;
+
+
+                    if (formMessage) {
+
+                        formMessage.textContent =
+                            "";
+                    }
+
+                }, 3000);
+
+            }, 900);
+        }
+    );
+}
